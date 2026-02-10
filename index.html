@@ -106,23 +106,110 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .pulse {
             animation: pulse 1s ease-in-out;
         }
 
-        .message {
-            margin-top: 30px;
-            font-size: 1.3em;
-            color: #666;
-            font-style: italic;
+        /* ===== VIDEO SECTION ===== */
+        .videos-section {
+            display: none;
+            margin-top: 40px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .videos-section.visible {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .celebration-message {
+            font-size: 1.8em;
+            color: #764ba2;
+            font-weight: bold;
+            margin-bottom: 25px;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 25px;
+        }
+
+        .video-wrapper iframe,
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 15px;
+        }
+
+        .video-wrapper video {
+            background: #000;
+            object-fit: contain;
+        }
+
+        .second-video-wrapper {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .second-video-wrapper.visible {
+            display: block;
+        }
+
+        .reveal-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .reveal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        .reveal-btn:active {
+            transform: translateY(0);
+        }
+
+        .reveal-btn.hidden {
+            display: none;
         }
 
         @media (max-width: 600px) {
@@ -141,21 +228,30 @@
             .countdown {
                 gap: 15px;
             }
+
+            .celebration-message {
+                font-size: 1.3em;
+            }
+
+            .reveal-btn {
+                font-size: 1em;
+                padding: 13px 30px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>عمر فريد هيخلص جيش امتى</h1>
-        
+
         <div class="image-container">
-            <img src="./main.png" 
-                 alt="صورة شخصية" 
+            <img src="./main.png"
+                 alt="صورة شخصية"
                  class="profile-image"
                  onerror="this.src='https://via.placeholder.com/200?text=صورة'">
         </div>
 
-        <div class="countdown">
+        <div class="countdown" id="countdown-grid">
             <div class="time-box" id="days-box">
                 <span class="time-value" id="days">0</span>
                 <span class="time-label">يوم</span>
@@ -174,48 +270,101 @@
             </div>
         </div>
 
-   
+        <!-- Videos section (shown when countdown ends) -->
+        <div class="videos-section" id="videos-section">
+            <div class="celebration-message">🎉  🎉</div>
+
+            <!-- First Video: YouTube -->
+            <div class="video-wrapper" id="first-video">
+                <iframe
+                    src="https://www.youtube.com/embed/JDIIsEQKiWo?autoplay=1"
+                    title="الفيديو الأول"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+            <!-- Button to reveal second video -->
+            <button class="reveal-btn" id="reveal-btn" onclick="showSecondVideo()">
+                🎬 شوف الفيديو التاني
+            </button>
+
+            <!-- Second Video: Local MP4 -->
+            <div class="second-video-wrapper" id="second-video-wrapper">
+                <div class="video-wrapper">
+                    <video controls autoplay>
+                        <source src="./vid.mp4" type="video/mp4">
+                        متصفحك مش بيدعم الفيديو
+                    </video>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         // تاريخ النهاية: 14 فبراير 2026 الساعة 12 منتصف الليل
         const targetDate = new Date('2026-02-14T00:00:00').getTime();
+        let countdownEnded = false;
+
+        function showVideos() {
+            if (countdownEnded) return;
+            countdownEnded = true;
+
+            // Reset countdown to zeros
+            document.getElementById('days').textContent = '0';
+            document.getElementById('hours').textContent = '0';
+            document.getElementById('minutes').textContent = '0';
+            document.getElementById('seconds').textContent = '0';
+
+            // Show videos section
+            const videosSection = document.getElementById('videos-section');
+            videosSection.classList.add('visible');
+
+            // Scroll to videos
+            setTimeout(() => {
+                videosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+
+        function showSecondVideo() {
+            const btn = document.getElementById('reveal-btn');
+            const secondWrapper = document.getElementById('second-video-wrapper');
+
+            btn.classList.add('hidden');
+            secondWrapper.classList.add('visible');
+
+            setTimeout(() => {
+                secondWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
 
         function updateCountdown() {
+            if (countdownEnded) return;
+
             const now = new Date().getTime();
             const distance = targetDate - now;
 
-            if (distance < 0) {
-                document.getElementById('message').textContent = '🎉 انتهى الوقت! تم إنهاء الخدمة! 🎉';
-                document.getElementById('days').textContent = '0';
-                document.getElementById('hours').textContent = '0';
-                document.getElementById('minutes').textContent = '0';
-                document.getElementById('seconds').textContent = '0';
+            if (distance <= 0) {
+                showVideos();
                 return;
             }
 
-            // حساب الأيام والساعات والدقائق والثواني
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // تحديث القيم
             document.getElementById('days').textContent = days;
             document.getElementById('hours').textContent = hours;
             document.getElementById('minutes').textContent = minutes;
             document.getElementById('seconds').textContent = seconds;
 
-            // إضافة تأثير النبض للثواني
+            // Pulse effect on seconds
             const secondsBox = document.getElementById('seconds-box');
             secondsBox.classList.remove('pulse');
-            // استخدام setTimeout لإعادة إضافة الكلاس
-            setTimeout(() => {
-                secondsBox.classList.add('pulse');
-            }, 10);
+            setTimeout(() => secondsBox.classList.add('pulse'), 10);
         }
 
-        // تحديث العداد كل ثانية
         updateCountdown();
         setInterval(updateCountdown, 1000);
     </script>
