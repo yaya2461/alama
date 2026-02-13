@@ -327,27 +327,15 @@
         <div class="videos-section" id="videos-section">
             <div class="celebration-message">🎉🎉</div>
 
-            <!-- Videos Grid -->
-            <div class="videos-grid">
-                <!-- First Video: YouTube -->
-                <div class="video-wrapper" id="first-video">
-                    <iframe
-                        src="https://www.youtube.com/embed/JDIIsEQKiWo?autoplay=1"
-                        title="الفيديو الأول"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
-                </div>
-
-                <!-- Second Video: Local MP4 -->
-                <div class="video-wrapper">
-                    <video controls>
-                        <source src="./vid.mp4" type="video/mp4">
-                        متصفحك مش بيدعم الفيديو
-                    </video>
-                </div>
-            </div>
-
+<iframe 
+  width="560" 
+  height="315" 
+  src="https://www.youtube.com/embed/JDIIsEQKiWo"
+  title="YouTube video player" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+  allowfullscreen>
+</iframe>
             <!-- Button to reveal gallery -->
             <button class="reveal-btn" id="reveal-btn" onclick="showGallery()">
                 🎬 شوف الصور والفيديوهات
@@ -356,11 +344,13 @@
             <!-- Gallery Section -->
             <div class="gallery-section" id="gallery-section" style="display: none;">
                 <!-- Images Gallery -->
+                <div class="gallery-title">📸 معرض الصور</div>
                 <div class="images-grid" id="images-grid">
                     <!-- Images will be inserted here by JavaScript -->
                 </div>
 
                 <!-- Videos from List -->
+                <div class="gallery-title">🎥 المزيد من الفيديوهات</div>
                 <div class="videos-grid" id="videos-grid">
                     <!-- Videos will be inserted here by JavaScript -->
                 </div>
@@ -380,8 +370,8 @@
             'https://res.cloudinary.com/dk96meuay/video/upload/v1770983048/WhatsApp_Video_2026-02-11_at_10.17.01_nxiqsv.mp4'
         ];
 
-        // تاريخ النهاية: 14 فبراير 2026 الساعة 12 منتصف الليل
-        let targetDate = new Date('2026-02-14T00:00:00').getTime();
+        // تاريخ النهاية: 13 فبراير 2026 الساعة 12 صباحاً (للاختبار)
+        let targetDate = new Date('2025-02-13T00:00:00').getTime();
         let countdownEnded = false;
 
         function loadGalleryContent() {
@@ -396,8 +386,26 @@
                 imagesGrid.appendChild(img);
             });
 
-            // Load videos
+            // Load videos from list
             const videosGrid = document.getElementById('videos-grid');
+            
+            // Add local MP4 video first
+            const localWrapper = document.createElement('div');
+            localWrapper.className = 'video-wrapper';
+            
+            const localVideo = document.createElement('video');
+            localVideo.controls = true;
+            
+            const localSource = document.createElement('source');
+            localSource.src = './vid.mp4';
+            localSource.type = 'video/mp4';
+            
+            localVideo.appendChild(localSource);
+            localVideo.appendChild(document.createTextNode('متصفحك مش بيدعم الفيديو'));
+            localWrapper.appendChild(localVideo);
+            videosGrid.appendChild(localWrapper);
+            
+            // Add videos from array
             videos.forEach((videoUrl, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'video-wrapper';
